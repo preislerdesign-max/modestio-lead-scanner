@@ -4,603 +4,688 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Modestio Lead Scanner</title>
-  <meta name="description" content="Jednoduchý interní nástroj pro přípravu AI auditu firemních webů a marketingu." />
+  <meta name="description" content="Minimalistický AI scanner leadů pro Modestio." />
   <style>
     :root {
-      --bg: #0d0d0f;
-      --panel: #16161a;
-      --panel-2: #1f1f25;
-      --text: #f6f4ef;
-      --muted: #a7a398;
-      --line: rgba(255,255,255,.1);
-      --brand: #d7b56d;
-      --brand-2: #f3dd9f;
-      --danger: #ff7474;
-      --ok: #88d18a;
-      --shadow: 0 20px 60px rgba(0,0,0,.28);
-      --radius: 24px;
+      --bg: #f4efe6;
+      --ink: #151515;
+      --muted: #716b61;
+      --soft: #e6dccd;
+      --paper: #fffaf1;
+      --panel: rgba(255, 250, 241, .82);
+      --line: rgba(21,21,21,.12);
+      --accent: #c88b4a;
+      --accent-dark: #926034;
+      --success: #177245;
+      --warning: #a05a00;
+      --danger: #a13c32;
+      --radius-xl: 32px;
+      --radius-lg: 22px;
+      --shadow: 0 24px 80px rgba(40, 29, 15, .12);
     }
 
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(215,181,109,.18), transparent 32rem),
-        radial-gradient(circle at bottom right, rgba(255,255,255,.08), transparent 28rem),
-        var(--bg);
-      color: var(--text);
-      min-height: 100vh;
+        radial-gradient(circle at 12% 8%, rgba(200,139,74,.22), transparent 28rem),
+        radial-gradient(circle at 88% 78%, rgba(21,21,21,.075), transparent 24rem),
+        linear-gradient(135deg, #f7f1e8 0%, #ede3d3 100%);
     }
 
-    a { color: var(--brand-2); }
-    button, input, textarea, select { font: inherit; }
+    button, textarea, input { font: inherit; }
 
-    .app {
-      width: min(1180px, calc(100% - 32px));
+    .wrap {
+      width: min(1120px, calc(100% - 32px));
       margin: 0 auto;
-      padding: 32px 0 56px;
+      padding: 28px 0 56px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      font-weight: 850;
+      letter-spacing: -.03em;
+    }
+
+    .mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--ink);
+      color: var(--paper);
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      letter-spacing: -.08em;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.1);
+    }
+
+    .settings-btn {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.28);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 750;
     }
 
     .hero {
       display: grid;
-      grid-template-columns: 1.25fr .75fr;
+      grid-template-columns: 1.05fr .95fr;
       gap: 24px;
       align-items: stretch;
-      margin-bottom: 24px;
     }
 
     .card {
-      background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025));
+      background: var(--panel);
       border: 1px solid var(--line);
-      border-radius: var(--radius);
+      border-radius: var(--radius-xl);
       box-shadow: var(--shadow);
-      overflow: hidden;
+      backdrop-filter: blur(20px);
     }
 
-    .hero-main { padding: 34px; }
-    .eyebrow {
-      color: var(--brand-2);
-      text-transform: uppercase;
-      letter-spacing: .16em;
-      font-size: 12px;
-      font-weight: 800;
-      margin-bottom: 12px;
+    .intro {
+      padding: clamp(28px, 5vw, 52px);
     }
+
+    .eyebrow {
+      color: var(--accent-dark);
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      font-size: 12px;
+      font-weight: 900;
+      margin-bottom: 18px;
+    }
+
     h1 {
       margin: 0;
-      font-size: clamp(34px, 5vw, 62px);
-      line-height: .95;
-      letter-spacing: -.05em;
-    }
-    .subtitle {
-      color: var(--muted);
-      font-size: 17px;
-      line-height: 1.65;
-      margin: 20px 0 0;
       max-width: 760px;
+      font-size: clamp(42px, 8vw, 92px);
+      line-height: .88;
+      letter-spacing: -.075em;
     }
 
-    .hero-side {
-      padding: 24px;
+    .intro p {
+      max-width: 640px;
+      margin: 24px 0 0;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.65;
+    }
+
+    .scanner {
+      padding: clamp(22px, 4vw, 34px);
       display: grid;
-      gap: 14px;
-      align-content: center;
-    }
-    .metric {
-      padding: 18px;
-      border-radius: 18px;
-      background: rgba(255,255,255,.055);
-      border: 1px solid var(--line);
-    }
-    .metric strong { display: block; font-size: 28px; }
-    .metric span { color: var(--muted); font-size: 14px; }
-
-    .grid {
-      display: grid;
-      grid-template-columns: .95fr 1.05fr;
-      gap: 24px;
-      align-items: start;
+      gap: 16px;
     }
 
-    .section { padding: 24px; }
-    .section h2 {
-      margin: 0 0 16px;
-      font-size: 22px;
-      letter-spacing: -.02em;
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 850;
+      color: var(--ink);
+      margin-bottom: 10px;
     }
 
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
-    .field { display: grid; gap: 8px; }
-    .field.full { grid-column: 1 / -1; }
-    label { color: var(--muted); font-size: 13px; font-weight: 700; }
-    input, textarea, select {
+    textarea, input {
       width: 100%;
-      color: var(--text);
-      background: rgba(255,255,255,.07);
       border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 13px 14px;
+      background: rgba(255,255,255,.48);
+      color: var(--ink);
+      border-radius: var(--radius-lg);
       outline: none;
-      transition: border .15s, background .15s;
-    }
-    textarea { resize: vertical; min-height: 104px; }
-    input:focus, textarea:focus, select:focus {
-      border-color: rgba(215,181,109,.65);
-      background: rgba(255,255,255,.09);
+      padding: 17px 18px;
+      transition: border .16s, background .16s, box-shadow .16s;
     }
 
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 16px;
+    textarea {
+      min-height: 172px;
+      resize: vertical;
+      line-height: 1.55;
     }
-    .btn {
-      appearance: none;
-      border: 0;
-      border-radius: 999px;
-      padding: 12px 16px;
-      font-weight: 800;
-      cursor: pointer;
-      color: #121212;
-      background: linear-gradient(135deg, var(--brand), var(--brand-2));
-      transition: transform .12s, opacity .12s;
-    }
-    .btn:hover { transform: translateY(-1px); }
-    .btn.secondary {
-      color: var(--text);
-      background: rgba(255,255,255,.08);
-      border: 1px solid var(--line);
-    }
-    .btn.danger {
-      color: #fff;
-      background: rgba(255,116,116,.2);
-      border: 1px solid rgba(255,116,116,.35);
+
+    textarea:focus, input:focus {
+      border-color: rgba(200,139,74,.65);
+      background: rgba(255,255,255,.72);
+      box-shadow: 0 0 0 5px rgba(200,139,74,.12);
     }
 
     .hint {
       color: var(--muted);
       font-size: 13px;
-      line-height: 1.55;
-      margin-top: 12px;
+      line-height: 1.5;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 16px 22px;
+      cursor: pointer;
+      font-weight: 900;
+      letter-spacing: -.02em;
+      color: var(--paper);
+      background: var(--ink);
+      box-shadow: 0 12px 32px rgba(21,21,21,.16);
+      transition: transform .14s, opacity .14s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+    .btn:disabled { opacity: .58; cursor: not-allowed; transform: none; }
+    .btn.secondary {
+      background: rgba(255,255,255,.4);
+      color: var(--ink);
+      border: 1px solid var(--line);
+      box-shadow: none;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
     }
 
     .status {
       display: none;
-      margin-top: 14px;
-      padding: 12px 14px;
-      border-radius: 14px;
-      background: rgba(255,255,255,.07);
+      padding: 13px 15px;
+      border-radius: 18px;
       border: 1px solid var(--line);
+      background: rgba(255,255,255,.34);
       color: var(--muted);
       font-size: 14px;
-      line-height: 1.5;
+      line-height: 1.55;
     }
     .status.show { display: block; }
-    .status.ok { color: var(--ok); border-color: rgba(136,209,138,.35); }
-    .status.err { color: var(--danger); border-color: rgba(255,116,116,.35); }
+    .status.err { color: var(--danger); border-color: rgba(161,60,50,.32); }
+    .status.ok { color: var(--success); border-color: rgba(23,114,69,.32); }
 
-    .tabs {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 14px;
+    .result {
+      margin-top: 24px;
+      display: none;
+      grid-template-columns: .75fr 1.25fr;
+      gap: 24px;
     }
-    .tab {
+
+    .result.show { display: grid; }
+
+    .score-card {
+      padding: 28px;
+      position: sticky;
+      top: 20px;
+    }
+
+    .score-ring {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      margin: 0 auto 22px;
+      display: grid;
+      place-items: center;
+      background: conic-gradient(var(--accent) calc(var(--score, 0) * 1%), rgba(21,21,21,.08) 0);
+      position: relative;
+    }
+
+    .score-ring::after {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      border-radius: 50%;
+      background: var(--paper);
       border: 1px solid var(--line);
-      background: rgba(255,255,255,.06);
+    }
+
+    .score-number {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      font-weight: 950;
+      font-size: 54px;
+      letter-spacing: -.08em;
+    }
+
+    .score-number span {
+      display: block;
+      font-size: 12px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
       color: var(--muted);
-      border-radius: 999px;
-      padding: 9px 12px;
-      cursor: pointer;
-      font-weight: 800;
-      font-size: 13px;
-    }
-    .tab.active {
-      background: rgba(215,181,109,.2);
-      border-color: rgba(215,181,109,.48);
-      color: var(--brand-2);
+      margin-top: 4px;
     }
 
-    .output {
-      min-height: 520px;
-      white-space: pre-wrap;
-      background: #0a0a0c;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 18px;
-      color: #efeadc;
-      line-height: 1.55;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: 13px;
-      overflow: auto;
+    .verdict {
+      text-align: center;
+      font-size: 24px;
+      letter-spacing: -.035em;
+      margin: 0 0 10px;
     }
+
+    .service-pill {
+      width: fit-content;
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 9px 13px;
+      border-radius: 999px;
+      background: rgba(200,139,74,.16);
+      border: 1px solid rgba(200,139,74,.28);
+      color: var(--accent-dark);
+      font-weight: 850;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .detail {
+      padding: 28px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .detail h2, .detail h3 {
+      margin: 0;
+      letter-spacing: -.035em;
+    }
+
+    .summary {
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.65;
+      margin: 0;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.38);
+      padding: 8px 11px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .block {
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: rgba(255,255,255,.32);
+    }
+
+    .block p, .block li {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .block p:last-child { margin-bottom: 0; }
+
+    ul { margin: 12px 0 0; padding-left: 20px; }
+
+    .script {
+      white-space: pre-wrap;
+      color: var(--ink);
+      line-height: 1.68;
+      font-size: 15px;
+    }
+
+    .history {
+      margin-top: 24px;
+      padding: 24px;
+    }
+
+    .history-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .history-top h2 { margin: 0; letter-spacing: -.04em; }
 
     .lead-list {
       display: grid;
       gap: 10px;
-      margin-top: 14px;
-    }
-    .lead-item {
-      padding: 14px;
-      border-radius: 16px;
-      background: rgba(255,255,255,.055);
-      border: 1px solid var(--line);
-      display: grid;
-      gap: 6px;
-    }
-    .lead-item strong { font-size: 15px; }
-    .lead-item small { color: var(--muted); line-height: 1.45; }
-    .lead-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
-    .mini {
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-      border-radius: 999px;
-      padding: 7px 10px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 800;
     }
 
-    .footer {
-      margin-top: 24px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.6;
+    .lead-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,.3);
+    }
+
+    .lead-item strong { display: block; }
+    .lead-item small { color: var(--muted); line-height: 1.45; }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(21,21,21,.42);
+      z-index: 20;
+    }
+    .modal.show { display: flex; }
+
+    .modal-card {
+      width: min(680px, 100%);
+      padding: 28px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+    }
+
+    .modal-card h2 { margin: 0 0 12px; }
+    .modal-card p { color: var(--muted); line-height: 1.55; }
+
+    .settings-grid {
+      display: grid;
+      gap: 14px;
+      margin: 18px 0;
     }
 
     @media (max-width: 900px) {
-      .hero, .grid { grid-template-columns: 1fr; }
-      .form-grid { grid-template-columns: 1fr; }
+      .hero, .result { grid-template-columns: 1fr; }
+      .score-card { position: static; }
+      h1 { font-size: clamp(44px, 16vw, 72px); }
     }
   </style>
 </head>
 <body>
-  <main class="app">
+  <main class="wrap">
+    <header>
+      <div class="brand"><div class="mark">M</div><span>modestio lead scanner</span></div>
+      <button class="settings-btn" id="openSettings">Nastavení AI</button>
+    </header>
+
     <section class="hero">
-      <div class="card hero-main">
+      <div class="card intro">
         <div class="eyebrow">Modestio internal tool</div>
-        <h1>Lead Scanner</h1>
-        <p class="subtitle">
-          Jednoduchý nástroj pro rychlou přípravu AI auditu potenciálního klienta. Zadáš IČO, web a sociální sítě, aplikace připraví strukturovaný prompt, obchodní checklist a uloží lead do prohlížeče.
-        </p>
+        <h1>Scan. Score. Call.</h1>
+        <p>Vlož IČO, web nebo sociální sítě. Aplikace vyhodnotí, jestli je firma dobrý lead pro Modestio, doporučí službu a připraví přirozený friendly callscript.</p>
       </div>
-      <aside class="card hero-side">
-        <div class="metric"><strong id="leadCount">0</strong><span>uložených leadů v tomto prohlížeči</span></div>
-        <div class="metric"><strong>MVP</strong><span>bez backendu, bez databáze, připravené pro GitHub Pages</span></div>
-      </aside>
-    </section>
 
-    <section class="grid">
-      <div class="card section">
-        <h2>Nový lead</h2>
-        <div class="form-grid">
-          <div class="field">
-            <label for="ico">IČO</label>
-            <input id="ico" placeholder="např. 12345678" inputmode="numeric" />
-          </div>
-          <div class="field">
-            <label for="companyName">Název firmy</label>
-            <input id="companyName" placeholder="doplní ARES nebo vyplň ručně" />
-          </div>
-          <div class="field full">
-            <label for="website">Web</label>
-            <input id="website" placeholder="https://www.example.cz" />
-          </div>
-          <div class="field">
-            <label for="instagram">Instagram</label>
-            <input id="instagram" placeholder="https://instagram.com/..." />
-          </div>
-          <div class="field">
-            <label for="facebook">Facebook</label>
-            <input id="facebook" placeholder="https://facebook.com/..." />
-          </div>
-          <div class="field">
-            <label for="linkedin">LinkedIn</label>
-            <input id="linkedin" placeholder="https://linkedin.com/company/..." />
-          </div>
-          <div class="field">
-            <label for="statusSelect">Status</label>
-            <select id="statusSelect">
-              <option>Nový</option>
-              <option>Prověřit</option>
-              <option>Zavolat</option>
-              <option>Zavoláno</option>
-              <option>Follow-up</option>
-              <option>Schůzka</option>
-              <option>Vyhráno</option>
-              <option>Ztraceno</option>
-            </select>
-          </div>
-          <div class="field full">
-            <label for="notes">Poznámky</label>
-            <textarea id="notes" placeholder="Co víme o firmě? Co tě na ní zaujalo? Jaká služba Modestia by mohla dávat smysl?"></textarea>
-          </div>
+      <div class="card scanner">
+        <div>
+          <label for="leadInput">Lead ke scanu</label>
+          <textarea id="leadInput" placeholder="Např.\nIČO: 12345678\nhttps://www.firma.cz\nhttps://instagram.com/firma\n\nNebo sem prostě vlož jen web / IČO / sociální síť."></textarea>
         </div>
-
         <div class="actions">
-          <button class="btn" id="aresBtn">Načíst z ARES</button>
-          <button class="btn secondary" id="promptBtn">Vygenerovat AI prompt</button>
-          <button class="btn secondary" id="saveBtn">Uložit lead</button>
-          <button class="btn secondary" id="clearBtn">Vyčistit formulář</button>
+          <button class="btn" id="scanBtn">Scanovat lead</button>
+          <button class="btn secondary" id="clearBtn">Vyčistit</button>
         </div>
-        <div class="status" id="statusBox"></div>
-        <p class="hint">
-          Data se ukládají jen lokálně v tvém prohlížeči přes localStorage. Žádné API klíče, žádný backend, žádná databáze.
-        </p>
-
-        <h2 style="margin-top:28px">Uložené leady</h2>
-        <div class="actions" style="margin-top:0">
-          <button class="btn secondary" id="exportJsonBtn">Export JSON</button>
-          <button class="btn secondary" id="exportCsvBtn">Export CSV</button>
-          <button class="btn danger" id="deleteAllBtn">Smazat vše</button>
-        </div>
-        <div class="lead-list" id="leadList"></div>
-      </div>
-
-      <div class="card section">
-        <div class="tabs">
-          <button class="tab active" data-tab="prompt">AI prompt</button>
-          <button class="tab" data-tab="checklist">Checklist</button>
-          <button class="tab" data-tab="call">Call script</button>
-          <button class="tab" data-tab="email">Follow-up e-mail</button>
-        </div>
-        <div class="actions" style="margin-top:0;margin-bottom:14px">
-          <button class="btn" id="copyBtn">Kopírovat výstup</button>
-        </div>
-        <pre class="output" id="output">Vyplň lead a klikni na „Vygenerovat AI prompt“.</pre>
+        <div class="hint">AI klíč není v tomto webu. Běží bezpečně přes Cloudflare Worker, který nastavíme v dalším kroku.</div>
+        <div class="status" id="status"></div>
       </div>
     </section>
 
-    <p class="footer">
-      Tip: První verze je záměrně jednoduchá. AI audit se zatím dělá tak, že zkopíruješ prompt do ChatGPT. Další verze může mít serverless backend a automatické napojení na OpenAI API.
-    </p>
+    <section class="result" id="result">
+      <aside class="card score-card">
+        <div class="score-ring" id="scoreRing"><div class="score-number"><span id="scoreValue">–</span><span>lead score</span></div></div>
+        <h2 class="verdict" id="verdict">–</h2>
+        <div class="service-pill" id="servicePill">–</div>
+        <div class="actions" style="justify-content:center; margin-top:20px;">
+          <button class="btn secondary" id="copyScriptBtn">Kopírovat callscript</button>
+        </div>
+      </aside>
+
+      <article class="card detail">
+        <div>
+          <div class="eyebrow" id="companyName">AI výstup</div>
+          <h2 id="headline">Výsledek scanu</h2>
+          <p class="summary" id="summary"></p>
+        </div>
+
+        <div class="chips" id="chips"></div>
+
+        <div class="block">
+          <h3>Proč je to příležitost</h3>
+          <ul id="reasons"></ul>
+        </div>
+
+        <div class="block">
+          <h3>Slabá místa</h3>
+          <ul id="weaknesses"></ul>
+        </div>
+
+        <div class="block">
+          <h3>Friendly callscript</h3>
+          <div class="script" id="callScript"></div>
+        </div>
+
+        <div class="block">
+          <h3>Follow-up e-mail</h3>
+          <div class="script" id="followupEmail"></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="card history">
+      <div class="history-top">
+        <h2>Poslední scany</h2>
+        <button class="btn secondary" id="exportBtn">Export JSON</button>
+      </div>
+      <div class="lead-list" id="historyList"></div>
+    </section>
   </main>
+
+  <div class="modal" id="settingsModal">
+    <div class="modal-card">
+      <h2>Nastavení AI napojení</h2>
+      <p>Sem vlož URL svého Cloudflare Workeru. OpenAI API klíč zůstává bezpečně uložený ve Workeru, nikdy ne v GitHub Pages.</p>
+      <div class="settings-grid">
+        <div>
+          <label for="workerUrl">Worker URL</label>
+          <input id="workerUrl" placeholder="https://modestio-lead-scanner.tvoje-jmeno.workers.dev" />
+        </div>
+        <div>
+          <label for="clientToken">Volitelný přístupový token</label>
+          <input id="clientToken" placeholder="např. vlastni-heslo-pro-aplikaci" />
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn" id="saveSettings">Uložit nastavení</button>
+        <button class="btn secondary" id="closeSettings">Zavřít</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     const $ = (id) => document.getElementById(id);
-    const fields = ["ico", "companyName", "website", "instagram", "facebook", "linkedin", "statusSelect", "notes"];
-    const storageKey = "modestio_lead_scanner_v1";
-    let currentTab = "prompt";
-    let currentOutputs = {};
+    const storage = {
+      get workerUrl() { return localStorage.getItem('modestio_worker_url') || ''; },
+      set workerUrl(v) { localStorage.setItem('modestio_worker_url', v.trim()); },
+      get token() { return localStorage.getItem('modestio_client_token') || ''; },
+      set token(v) { localStorage.setItem('modestio_client_token', v.trim()); },
+      get scans() { return JSON.parse(localStorage.getItem('modestio_scans') || '[]'); },
+      set scans(v) { localStorage.setItem('modestio_scans', JSON.stringify(v)); }
+    };
 
-    function getFormData() {
-      const data = {};
-      fields.forEach((field) => data[field] = $(field).value.trim());
-      return data;
+    let lastScan = null;
+
+    function showStatus(message, type = '') {
+      const el = $('status');
+      el.textContent = message;
+      el.className = 'status show' + (type ? ' ' + type : '');
     }
 
-    function setFormData(data) {
-      fields.forEach((field) => $(field).value = data[field] || "");
+    function hideStatus() {
+      $('status').className = 'status';
+      $('status').textContent = '';
     }
 
-    function showStatus(message, type = "") {
-      const box = $("statusBox");
-      box.textContent = message;
-      box.className = `status show ${type}`;
+    function escapeHtml(str = '') {
+      return String(str).replace(/[&<>"]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
     }
 
-    function normalizeIco(value) {
-      return String(value || "").replace(/\D/g, "").padStart(8, "0");
-    }
-
-    async function fetchAres() {
-      const ico = normalizeIco($("ico").value);
-      if (!ico || ico.length !== 8) {
-        showStatus("Zadej platné osmimístné IČO.", "err");
-        return;
-      }
-
-      showStatus("Načítám veřejná data z ARESu…");
-
-      const endpoints = [
-        `https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty/${ico}`,
-        `https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/v3/ekonomicke-subjekty/${ico}`
-      ];
-
-      let lastError = null;
-      for (const url of endpoints) {
-        try {
-          const res = await fetch(url, { headers: { "Accept": "application/json" } });
-          if (!res.ok) throw new Error(`ARES odpověděl stavem ${res.status}`);
-          const data = await res.json();
-          const name = data.obchodniJmeno || data.nazev || data.name || "";
-          const address = data.sidlo?.textovaAdresa || data.textovaAdresa || "";
-          const legalForm = data.pravniForma || data.pravniFormaNazev || "";
-
-          if (name) $("companyName").value = name;
-          const currentNotes = $("notes").value.trim();
-          const aresNotes = [
-            address ? `Sídlo: ${address}` : "",
-            legalForm ? `Právní forma: ${legalForm}` : "",
-            data.datumVzniku ? `Datum vzniku: ${data.datumVzniku}` : ""
-          ].filter(Boolean).join("\n");
-
-          if (aresNotes && !currentNotes.includes("Sídlo:")) {
-            $("notes").value = [currentNotes, aresNotes].filter(Boolean).join("\n\n");
-          }
-
-          showStatus("Data z ARESu byla načtena. Zkontroluj firmu a doplň web/sítě.", "ok");
-          return;
-        } catch (err) {
-          lastError = err;
-        }
-      }
-
-      showStatus(`ARES se nepodařilo načíst. Může jít o CORS omezení nebo změnu endpointu. Vyplň název ručně. Detail: ${lastError?.message || "neznámá chyba"}`, "err");
-    }
-
-    function buildChecklist(data) {
-      return `KONTROLNÍ CHECKLIST PRO RUČNÍ AUDIT\n\nFirma: ${data.companyName || "neuvedeno"}\nIČO: ${data.ico || "neuvedeno"}\nWeb: ${data.website || "neuvedeno"}\n\n1) První dojem z webu\n- Je do 5 sekund jasné, co firma nabízí?\n- Je jasné, proč si vybrat právě tuto firmu?\n- Působí web moderně, důvěryhodně a profesionálně?\n\n2) Brand a positioning\n- Má firma zapamatovatelnou značku?\n- Má jednotný vizuální styl?\n- Komunikuje jasný rozdíl oproti konkurenci?\n\n3) Web a UX\n- Je hlavní CTA viditelné?\n- Dá se jednoduše kontaktovat?\n- Je web přehledný na mobilu?\n- Jsou služby vysvětlené konkrétně?\n\n4) SEO\n- Mají stránky jasné titulky?\n- Jsou na webu klíčová slova pro obor a lokalitu?\n- Existuje blog, reference nebo obsahová sekce?\n\n5) Důvěryhodnost\n- Jsou vidět reference, recenze, případové studie, tým, fotky, certifikace?\n- Je kontakt kompletní a snadno dohledatelný?\n\n6) Sociální sítě\nInstagram: ${data.instagram || "neuvedeno"}\nFacebook: ${data.facebook || "neuvedeno"}\nLinkedIn: ${data.linkedin || "neuvedeno"}\n- Jsou sítě aktivní?\n- Je obsah konzistentní s webem?\n- Je komunikace obchodně použitelná?\n\n7) Obchodní příležitost pro Modestio\n- Potřebuje firma spíš brand/rebranding?\n- Potřebuje nový web?\n- Potřebuje marketing a správu obsahu?\n- Existuje jasný důvod pro telefonické oslovení?`;
-    }
-
-    function buildPrompt(data) {
-      return `Jsi seniorní brand stratég, UX konzultant, SEO specialista a B2B obchodní konzultant pro digitální agenturu Modestio.\n\nModestio se specializuje na tvorbu brandů, rebranding, webové stránky a marketing. Tvým úkolem je vyhodnotit potenciálního klienta a najít konkrétní slabá místa, se kterými mu Modestio může pomoct.\n\nVSTUPNÍ DATA\nFirma: ${data.companyName || "neuvedeno"}\nIČO: ${data.ico || "neuvedeno"}\nWeb: ${data.website || "neuvedeno"}\nInstagram: ${data.instagram || "neuvedeno"}\nFacebook: ${data.facebook || "neuvedeno"}\nLinkedIn: ${data.linkedin || "neuvedeno"}\nPoznámky:\n${data.notes || "neuvedeno"}\n\nPOSTUP\n1. Projdi dostupné informace z webu a sociálních sítí.\n2. Nehodnoť obecně. Hledej konkrétní slabá místa.\n3. Zaměř se na slabiny, které mají obchodní dopad: méně poptávek, slabá důvěryhodnost, špatný první dojem, nejasná nabídka, zastaralý web, chybějící brand, slabý obsah, slabé sociální sítě.\n4. Nevymýšlej si fakta. Když něco nejde ověřit, napiš „nelze ověřit“.\n5. Výstup piš česky a prakticky, jako podklad pro telefonické oslovení firmy.\n\nVYHODNOŤ TYTO OBLASTI\n- Brand a positioning\n- Vizuální identita\n- Web a UX\n- Konverzní prvky\n- SEO základy\n- Důvěryhodnost\n- Obsah a copywriting\n- Sociální sítě\n- Obchodní příležitost pro Modestio\n\nVÝSTUP\nVrať odpověď v této struktuře:\n\n1. Rychlé shrnutí firmy\n2. Lead score 0–100 a důvod skóre\n3. Top 5 slabých míst\n   - slabina\n   - proč je to problém\n   - obchodní dopad\n   - jak by pomohlo Modestio\n4. Nejvhodnější služba Modestia\n   - brand / rebranding / web / marketing / sociální sítě / kombinace\n5. Konkrétní argument pro první telefonát\n6. Telefonní script\n7. Možné námitky klienta a odpovědi\n8. Krátký follow-up e-mail\n9. Priorita oslovení: nízká / střední / vysoká\n10. Doporučený další krok`;    }
-
-    function buildCallScript(data) {
-      const company = data.companyName || "vaši firmu";
-      return `TELEFONNÍ SCRIPT\n\nDobrý den, tady Samuel z Modestia. Díváme se u vybraných firem na to, jak působí jejich web, značka a online komunikace. Narazil jsem na ${company} a všiml jsem si několika věcí, které by mohly mít vliv na první dojem a počet poptávek.\n\nNevolám kvůli žádnému balíčku naslepo. Spíš jsem se chtěl krátce zeptat, jestli teď řešíte, jak lépe prezentovat firmu, web nebo marketing.\n\nPokud ano, můžu vám zdarma poslat krátký přehled 3–5 konkrétních bodů, kde podle nás může být prostor ke zlepšení.\n\nKdyž se zeptají „co konkrétně?“:\nNa první pohled bych se podíval hlavně na jasnost nabídky, důvěryhodnost webu, konverzní prvky a to, jestli komunikace odpovídá kvalitě vašich služeb. Nechci vám ale střílet diagnózu od boku — radši bych vám poslal stručný audit a pak si případně řekneme, jestli to dává smysl řešit.\n\nCíl hovoru:\n- zjistit, jestli firma řeší web/brand/marketing,\n- získat souhlas s posláním krátkého auditu,\n- domluvit návazný hovor nebo schůzku.`;
-    }
-
-    function buildEmail(data) {
-      const company = data.companyName || "vaší firmy";
-      return `Předmět: Krátký pohled na online prezentaci ${company}\n\nDobrý den,\n\nnavazuji na náš krátký hovor. Jak jsem zmiňoval, v Modestiu se zaměřujeme na tvorbu brandů, rebranding, webové stránky a marketing.\n\nPodíval jsem se na online prezentaci ${company} a připravil bych vám stručný pohled na několik míst, kde může být prostor ke zlepšení — například v prvním dojmu z webu, jasnosti nabídky, důvěryhodnosti, obsahu nebo konverzních prvcích.\n\nNejde o obecnou nabídku. Cílem je ukázat konkrétní body, které mohou mít vliv na to, jak vás vnímají potenciální zákazníci a kolik poptávek z webu reálně získáte.\n\nMůžeme si k tomu dát krátký 20minutový hovor příští týden?\n\nS pozdravem\nSamuel\nModestio\nhttps://www.modestio.cz/`;
-    }
-
-    function generateOutputs() {
-      const data = getFormData();
-      currentOutputs = {
-        prompt: buildPrompt(data),
-        checklist: buildChecklist(data),
-        call: buildCallScript(data),
-        email: buildEmail(data)
-      };
-      $("output").textContent = currentOutputs[currentTab];
-      showStatus("Výstupy jsou připravené. Zkopíruj AI prompt do ChatGPT a nech si vyhodnotit firmu.", "ok");
-    }
-
-    function copyOutput() {
-      const text = $("output").textContent;
-      navigator.clipboard.writeText(text).then(() => {
-        showStatus("Výstup zkopírován do schránky.", "ok");
-      }).catch(() => {
-        showStatus("Kopírování se nepodařilo. Označ text ručně a zkopíruj ho.", "err");
+    function renderList(id, items) {
+      const el = $(id);
+      el.innerHTML = '';
+      (items || []).forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        el.appendChild(li);
       });
     }
 
-    function getLeads() {
-      try { return JSON.parse(localStorage.getItem(storageKey)) || []; }
-      catch { return []; }
+    function renderScan(scan) {
+      lastScan = scan;
+      $('result').classList.add('show');
+      const score = Math.max(0, Math.min(100, Number(scan.lead_score || 0)));
+      $('scoreRing').style.setProperty('--score', score);
+      $('scoreValue').textContent = score;
+      $('verdict').textContent = scan.verdict || 'Vyhodnoceno';
+      $('servicePill').textContent = scan.recommended_service || 'Doporučená služba Modestia';
+      $('companyName').textContent = scan.company_name || 'Neznámá firma';
+      $('headline').textContent = scan.headline || 'Výsledek scanu';
+      $('summary').textContent = scan.summary || '';
+
+      const chips = $('chips');
+      chips.innerHTML = '';
+      [scan.lead_temperature, scan.priority, scan.confidence].filter(Boolean).forEach(value => {
+        const chip = document.createElement('div');
+        chip.className = 'chip';
+        chip.textContent = value;
+        chips.appendChild(chip);
+      });
+
+      renderList('reasons', scan.reasons || []);
+      renderList('weaknesses', scan.weaknesses || []);
+      $('callScript').textContent = scan.call_script || '';
+      $('followupEmail').textContent = scan.followup_email || '';
+      window.scrollTo({ top: $('result').offsetTop - 16, behavior: 'smooth' });
     }
 
-    function setLeads(leads) {
-      localStorage.setItem(storageKey, JSON.stringify(leads));
-      renderLeads();
+    function saveToHistory(scan) {
+      const scans = storage.scans;
+      scans.unshift({ ...scan, saved_at: new Date().toISOString() });
+      storage.scans = scans.slice(0, 25);
+      renderHistory();
     }
 
-    function saveLead() {
-      const data = getFormData();
-      if (!data.companyName && !data.ico && !data.website) {
-        showStatus("Vyplň alespoň název firmy, IČO nebo web.", "err");
+    function renderHistory() {
+      const list = $('historyList');
+      const scans = storage.scans;
+      if (!scans.length) {
+        list.innerHTML = '<div class="hint">Zatím tu nejsou žádné scany.</div>';
         return;
       }
-      const leads = getLeads();
-      const lead = {
-        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
-        ...data,
-        createdAt: new Date().toISOString()
-      };
-      leads.unshift(lead);
-      setLeads(leads);
-      showStatus("Lead uložen v tomto prohlížeči.", "ok");
-    }
-
-    function renderLeads() {
-      const leads = getLeads();
-      $("leadCount").textContent = leads.length;
-      const list = $("leadList");
-      if (!leads.length) {
-        list.innerHTML = `<div class="lead-item"><small>Zatím tu nejsou žádné leady.</small></div>`;
-        return;
-      }
-      list.innerHTML = leads.map((lead) => `
+      list.innerHTML = scans.map((scan, index) => `
         <div class="lead-item">
-          <strong>${escapeHtml(lead.companyName || lead.website || lead.ico || "Neznámý lead")}</strong>
-          <small>${escapeHtml([lead.ico ? "IČO: " + lead.ico : "", lead.website, lead.statusSelect].filter(Boolean).join(" • "))}</small>
-          <div class="lead-actions">
-            <button class="mini" onclick="loadLead('${lead.id}')">Načíst</button>
-            <button class="mini" onclick="deleteLead('${lead.id}')">Smazat</button>
+          <div>
+            <strong>${escapeHtml(scan.company_name || 'Neznámá firma')} · ${escapeHtml(String(scan.lead_score || '–'))}/100</strong>
+            <small>${escapeHtml(scan.verdict || '')} · ${escapeHtml(scan.recommended_service || '')}</small>
           </div>
+          <button class="btn secondary" onclick="loadHistory(${index})">Otevřít</button>
         </div>
-      `).join("");
+      `).join('');
     }
 
-    function escapeHtml(str) {
-      return String(str || "").replace(/[&<>'"]/g, (char) => ({
-        "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
-      }[char]));
-    }
+    window.loadHistory = function(index) {
+      const scan = storage.scans[index];
+      if (scan) renderScan(scan);
+    };
 
-    window.loadLead = function(id) {
-      const lead = getLeads().find((item) => item.id === id);
-      if (!lead) return;
-      setFormData(lead);
-      generateOutputs();
-      showStatus("Lead načten do formuláře.", "ok");
-    }
-
-    window.deleteLead = function(id) {
-      const leads = getLeads().filter((item) => item.id !== id);
-      setLeads(leads);
-      showStatus("Lead smazán.", "ok");
-    }
-
-    function clearForm() {
-      fields.forEach((field) => $(field).value = field === "statusSelect" ? "Nový" : "");
-      $("output").textContent = "Vyplň lead a klikni na „Vygenerovat AI prompt“.";
-      currentOutputs = {};
-      showStatus("Formulář vyčištěn.", "ok");
-    }
-
-    function downloadFile(filename, content, type) {
-      const blob = new Blob([content], { type });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    }
-
-    function exportJson() {
-      downloadFile("modestio-leads.json", JSON.stringify(getLeads(), null, 2), "application/json");
-    }
-
-    function exportCsv() {
-      const leads = getLeads();
-      const headers = ["companyName", "ico", "website", "instagram", "facebook", "linkedin", "statusSelect", "notes", "createdAt"];
-      const rows = [headers.join(",")].concat(leads.map((lead) => headers.map((h) => csvCell(lead[h])).join(",")));
-      downloadFile("modestio-leads.csv", rows.join("\n"), "text/csv;charset=utf-8");
-    }
-
-    function csvCell(value) {
-      const clean = String(value || "").replace(/"/g, '""');
-      return `"${clean}"`;
-    }
-
-    document.querySelectorAll(".tab").forEach((tab) => {
-      tab.addEventListener("click", () => {
-        document.querySelectorAll(".tab").forEach((item) => item.classList.remove("active"));
-        tab.classList.add("active");
-        currentTab = tab.dataset.tab;
-        if (!currentOutputs[currentTab]) generateOutputs();
-        else $("output").textContent = currentOutputs[currentTab];
-      });
-    });
-
-    $("aresBtn").addEventListener("click", fetchAres);
-    $("promptBtn").addEventListener("click", generateOutputs);
-    $("saveBtn").addEventListener("click", saveLead);
-    $("clearBtn").addEventListener("click", clearForm);
-    $("copyBtn").addEventListener("click", copyOutput);
-    $("exportJsonBtn").addEventListener("click", exportJson);
-    $("exportCsvBtn").addEventListener("click", exportCsv);
-    $("deleteAllBtn").addEventListener("click", () => {
-      if (confirm("Opravdu chceš smazat všechny uložené leady v tomto prohlížeči?")) {
-        setLeads([]);
-        showStatus("Všechny leady byly smazány.", "ok");
+    async function scanLead() {
+      const input = $('leadInput').value.trim();
+      if (!input) {
+        showStatus('Nejdřív vlož IČO, web nebo sociální síť.', 'err');
+        return;
       }
+      const workerUrl = storage.workerUrl;
+      if (!workerUrl) {
+        $('settingsModal').classList.add('show');
+        showStatus('Nejdřív nastav Worker URL. To je bezpečný backend pro OpenAI API.', 'err');
+        return;
+      }
+
+      $('scanBtn').disabled = true;
+      showStatus('Scanuju lead, načítám dostupná data a posílám je do AI…');
+
+      try {
+        const res = await fetch(workerUrl.replace(/\/$/, '') + '/scan', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(storage.token ? { 'x-app-token': storage.token } : {})
+          },
+          body: JSON.stringify({ input })
+        });
+        const data = await res.json().catch(() => null);
+        if (!res.ok) {
+          throw new Error(data?.error || 'Scan se nepovedl. Zkontroluj Worker a API klíč.');
+        }
+        renderScan(data);
+        saveToHistory(data);
+        showStatus('Hotovo. Lead je vyhodnocený a uložený do historie.', 'ok');
+      } catch (error) {
+        showStatus(error.message || 'Něco se pokazilo.', 'err');
+      } finally {
+        $('scanBtn').disabled = false;
+      }
+    }
+
+    $('scanBtn').addEventListener('click', scanLead);
+    $('clearBtn').addEventListener('click', () => { $('leadInput').value = ''; hideStatus(); });
+    $('copyScriptBtn').addEventListener('click', async () => {
+      if (!lastScan?.call_script) return;
+      await navigator.clipboard.writeText(lastScan.call_script);
+      showStatus('Callscript zkopírován.', 'ok');
     });
 
-    renderLeads();
+    $('exportBtn').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(storage.scans, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `modestio-lead-scans-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    $('openSettings').addEventListener('click', () => {
+      $('workerUrl').value = storage.workerUrl;
+      $('clientToken').value = storage.token;
+      $('settingsModal').classList.add('show');
+    });
+    $('closeSettings').addEventListener('click', () => $('settingsModal').classList.remove('show'));
+    $('saveSettings').addEventListener('click', () => {
+      storage.workerUrl = $('workerUrl').value;
+      storage.token = $('clientToken').value;
+      $('settingsModal').classList.remove('show');
+      showStatus('Nastavení uloženo. Teď můžeš spustit scan.', 'ok');
+    });
+
+    renderHistory();
   </script>
 </body>
 </html>

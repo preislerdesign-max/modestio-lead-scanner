@@ -1,54 +1,48 @@
-# Modestio Lead Scanner
+# Modestio Lead Scanner v2
 
-Jednoduchá statická MVP aplikace pro přípravu AI auditu potenciálních klientů.
+Minimalistická AI aplikace pro rychlé vyhodnocení B2B leadů pro Modestio.
 
-## Co aplikace umí
+## Co umí
 
-- formulář pro IČO, web a sociální sítě,
-- pokus o načtení veřejných údajů z ARESu,
-- generování AI promptu pro ChatGPT,
-- checklist pro ruční audit,
-- telefonní script,
-- follow-up e-mail,
-- lokální ukládání leadů v prohlížeči přes localStorage,
-- export leadů do JSON a CSV.
+- Vložíš IČO, web nebo sociální sítě.
+- Klikneš na **Scanovat lead**.
+- Aplikace zavolá Cloudflare Worker.
+- Worker bezpečně použije OpenAI API klíč.
+- AI vrátí lead score, doporučenou službu, slabá místa, friendly callscript a follow-up e-mail.
 
-## Co aplikace zatím záměrně neumí
+## Soubory
 
-- nemá backend,
-- nemá databázi,
-- nemá přímé napojení na OpenAI API,
-- neukládá API klíče,
-- nescrapuje sociální sítě.
+- `index.html` — frontend pro GitHub Pages
+- `worker.js` — Cloudflare Worker backend
+- `.nojekyll` — vypnutí Jekyll buildu na GitHub Pages
 
-To je záměr. Díky tomu může běžet zdarma na GitHub Pages.
+## Nasazení frontendu na GitHub Pages
 
-## Nasazení na GitHub Pages
+Nahraj do repozitáře:
 
-1. Vytvoř nový GitHub repozitář, například `modestio-lead-scanner`.
-2. Nahraj do repozitáře soubory:
-   - `index.html`
-   - `.nojekyll`
-   - `README.md`
-3. V GitHubu otevři `Settings` → `Pages`.
-4. V části `Build and deployment` nastav:
-   - Source: `Deploy from a branch`
-   - Branch: `main`
-   - Folder: `/root`
-5. Ulož a otevři URL, kterou GitHub vygeneruje.
+- `index.html`
+- `README.md`
+- `.nojekyll`
 
-## Doporučený workflow
+GitHub Pages nastav na:
 
-1. Zadáš firmu.
-2. Klikneš na `Vygenerovat AI prompt`.
-3. Zkopíruješ prompt do ChatGPT.
-4. ChatGPT připraví audit.
-5. V aplikaci uložíš lead a nastavíš status.
+- Source: Deploy from a branch
+- Branch: main
+- Folder: /root
 
-## Další možná verze
+## Nasazení AI backendu přes Cloudflare Worker
 
-- Cloudflare Worker / Vercel Function jako bezpečný backend pro OpenAI API.
-- Automatický PageSpeed audit.
-- Firecrawl pro načítání obsahu webu.
-- Supabase databáze.
-- Přihlášení pro tým Modestia.
+1. Otevři Cloudflare dashboard.
+2. Workers & Pages → Create application → Create Worker.
+3. Vlož obsah souboru `worker.js`.
+4. Deploy.
+5. Ve Workeru nastav secrets:
+   - `OPENAI_API_KEY` = tvůj OpenAI API klíč
+   - volitelně `OPENAI_MODEL` = například `gpt-5.4`
+   - volitelně `APP_ACCESS_TOKEN` = jednoduchý token pro omezení přístupu
+6. Zkopíruj Worker URL.
+7. V aplikaci otevři **Nastavení AI** a vlož Worker URL.
+
+## Poznámka k bezpečnosti
+
+OpenAI API klíč nikdy nevkládej do `index.html` ani do GitHub repozitáře. Patří pouze do Cloudflare Worker secrets.
