@@ -1,24 +1,31 @@
-# Modestio Lead Scanner Pro v3
+# Modestio Lead Scanner v3.1 — OpenAI web search + dark theme
 
-Minimalistická interní aplikace pro Modestio. Vložíš IČO, web nebo sociální síť a aplikace přes Cloudflare Worker + OpenAI API připraví lead score, slabá místa, doporučené služby a friendly callscript.
+Interní akviziční aplikace pro Modestio.
 
-## Co je nové ve v3
+## Co umí
 
-- jeden jednoduchý vstup,
-- ARES lookup podle IČO,
-- crawl homepage a několika důležitých podstránek,
-- automatické nalezení sociálních odkazů přímo z webu,
-- volitelné veřejné dohledání webu a sociálních sítí přes Serper API,
-- detailnější audit brandu, webu, UX, obsahu, sociálních sítí a důvěryhodnosti,
-- podrobné priority pro coldcall.
+- zadáš IČO, web nebo sociální síť,
+- Worker načte ARES, pokud najde IČO,
+- OpenAI web search dohledá oficiální web a sociální profily,
+- pokud je dostupný web, Worker načte homepage a důležité podstránky,
+- AI vyhodnotí lead score, brand, web, UX, obsah, sítě a obchodní příležitost,
+- vygeneruje friendly callscript a follow-up e-mail.
 
-## Soubory
+## GitHub Pages
 
-- `index.html` nahraj na GitHub Pages,
-- `worker.js` vlož do Cloudflare Workeru,
-- `.nojekyll` je volitelný soubor pro GitHub Pages.
+Nahraj na GitHub Pages:
 
-## Cloudflare proměnné
+- `index.html`
+- `.nojekyll`
+- `README.md`
+
+## Cloudflare Worker
+
+Do Cloudflare Workeru nahraj:
+
+- `worker.js`
+
+## Variables and Secrets
 
 Povinné:
 
@@ -26,15 +33,8 @@ Povinné:
 
 Volitelné:
 
-- `OPENAI_MODEL` jako Text, např. `gpt-5.4-mini`
-- `SERPER_API_KEY` jako Secret pro dohledávání webu a sociálních sítí, když zadáš jen IČO
-- `APP_ACCESS_TOKEN` jako Secret, pokud chceš jednoduchou ochranu Workeru
+- `OPENAI_MODEL` jako Text, například model, který ti aktuálně funguje
+- `OPENAI_SEARCH_MODEL` jako Text, pokud chceš pro discovery použít jiný model
+- `APP_ACCESS_TOKEN` jako Secret, pokud chceš jednoduché zaheslování volání z frontendu
 
-## Poznámka
-
-Bez `SERPER_API_KEY` aplikace neumí spolehlivě najít oficiální web pouze podle IČO, protože ARES typicky nevrací webové stránky firem. Umí ale načíst ARES data, analyzovat zadaný web a vytáhnout sociální sítě, které jsou na webu odkazované.
-
-
-## Theme
-
-Tato verze používá dark theme v černo-červené barevnosti s bílým textem.
+Serper API není potřeba.
