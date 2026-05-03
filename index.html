@@ -3,420 +3,133 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Modestio Lead Scanner</title>
-  <meta name="description" content="Minimalistický AI scanner leadů pro Modestio." />
+  <title>Modestio Lead Scanner Pro</title>
+  <meta name="description" content="AI lead scanner pro Modestio: IČO, web nebo sociální sítě dovnitř, score a friendly callscript ven." />
   <style>
     :root {
-      --bg: #f4efe6;
-      --ink: #151515;
-      --muted: #716b61;
-      --soft: #e6dccd;
-      --paper: #fffaf1;
-      --panel: rgba(255, 250, 241, .82);
-      --line: rgba(21,21,21,.12);
-      --accent: #c88b4a;
-      --accent-dark: #926034;
-      --success: #177245;
-      --warning: #a05a00;
-      --danger: #a13c32;
+      --bg: #070709;
+      --paper: #101114;
+      --paper-2: rgba(16,17,20,.92);
+      --ink: #ffffff;
+      --muted: #c8c8cf;
+      --soft: #17181d;
+      --line: rgba(255,255,255,.09);
+      --accent: #e53935;
+      --accent-2: #ff6b67;
+      --green: #39b46c;
+      --red: #ff6b67;
+      --amber: #ffb347;
+      --shadow: 0 24px 90px rgba(0, 0, 0, .45);
       --radius-xl: 32px;
       --radius-lg: 22px;
-      --shadow: 0 24px 80px rgba(40, 29, 15, .12);
+      --radius-md: 16px;
     }
 
     * { box-sizing: border-box; }
-
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
       min-height: 100vh;
       color: var(--ink);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
-        radial-gradient(circle at 12% 8%, rgba(200,139,74,.22), transparent 28rem),
-        radial-gradient(circle at 88% 78%, rgba(21,21,21,.075), transparent 24rem),
-        linear-gradient(135deg, #f7f1e8 0%, #ede3d3 100%);
+        radial-gradient(circle at 14% 8%, rgba(229,57,53,.22), transparent 26rem),
+        radial-gradient(circle at 86% 70%, rgba(255,255,255,.05), transparent 24rem),
+        linear-gradient(135deg, #09090b 0%, #111216 100%);
     }
 
     button, textarea, input { font: inherit; }
+    .wrap { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 64px; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom: 28px; }
+    .brand { display:flex; align-items:center; gap:13px; font-weight:900; letter-spacing:-.035em; }
+    .mark { width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff; display:grid; place-items:center; font-weight:950; letter-spacing:-.08em; box-shadow:0 10px 24px rgba(229,57,53,.35); }
+    .settings-btn, .btn.secondary { border:1px solid var(--line); background:rgba(255,255,255,.04); color:var(--ink); }
+    .settings-btn { border-radius:999px; padding:10px 14px; cursor:pointer; font-weight:850; }
 
-    .wrap {
-      width: min(1120px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 28px 0 56px;
-    }
+    .hero { display:grid; grid-template-columns: .95fr 1.05fr; gap:24px; align-items:stretch; }
+    .card { background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border:1px solid var(--line); border-radius:var(--radius-xl); box-shadow:var(--shadow); backdrop-filter: blur(20px); }
+    .intro { padding: clamp(30px, 5vw, 56px); display:flex; flex-direction:column; justify-content:space-between; min-height: 420px; }
+    .eyebrow { color:var(--accent-2); text-transform:uppercase; letter-spacing:.2em; font-size:12px; font-weight:950; margin-bottom:18px; }
+    h1 { margin:0; font-size: clamp(48px, 8vw, 104px); line-height:.86; letter-spacing:-.08em; }
+    .intro p { max-width: 680px; margin:24px 0 0; color:var(--muted); font-size:18px; line-height:1.65; }
+    .mini-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top:28px; }
+    .mini-card { border:1px solid var(--line); border-radius:18px; padding:13px; background:rgba(255,255,255,.03); }
+    .mini-card strong { display:block; font-size:18px; letter-spacing:-.04em; }
+    .mini-card span { color:var(--muted); font-size:12px; line-height:1.35; }
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 28px;
-    }
+    .scanner { padding: clamp(24px, 4vw, 36px); display:grid; gap:16px; }
+    label { display:block; font-size:14px; font-weight:900; margin-bottom:10px; }
+    textarea, input { width:100%; border:1px solid var(--line); background:rgba(255,255,255,.04); color:var(--ink); border-radius:var(--radius-lg); outline:none; padding:17px 18px; transition: border .16s, background .16s, box-shadow .16s; }
+    textarea { min-height: 190px; resize:vertical; line-height:1.55; }
+    textarea:focus, input:focus { border-color: rgba(229,57,53,.72); background:rgba(255,255,255,.06); box-shadow:0 0 0 5px rgba(229,57,53,.14); }
+    .hint { color:var(--muted); font-size:13px; line-height:1.55; }
+    .actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .btn { border:0; border-radius:999px; padding:15px 20px; cursor:pointer; font-weight:950; letter-spacing:-.02em; color:#fff; background:linear-gradient(135deg, var(--accent), #b71c1c); box-shadow:0 12px 32px rgba(229,57,53,.28); transition: transform .14s, opacity .14s; display:inline-flex; align-items:center; justify-content:center; gap:10px; }
+    .btn:hover { transform:translateY(-1px); }
+    .btn:disabled { opacity:.58; cursor:not-allowed; transform:none; }
+    .btn.secondary { box-shadow:none; }
+    .status { display:none; padding:13px 15px; border-radius:18px; border:1px solid var(--line); background:rgba(255,255,255,.04); color:var(--muted); font-size:14px; line-height:1.55; }
+    .status.show { display:block; }
+    .status.err { color:var(--red); border-color:rgba(161,61,51,.32); }
+    .status.ok { color:var(--green); border-color:rgba(21,115,79,.32); }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 13px;
-      font-weight: 850;
-      letter-spacing: -.03em;
-    }
+    .result { margin-top:24px; display:none; grid-template-columns:.72fr 1.28fr; gap:24px; align-items:start; }
+    .result.show { display:grid; }
+    .score-card { padding:28px; position:sticky; top:20px; display:grid; gap:18px; }
+    .score-ring { width:188px; height:188px; border-radius:50%; margin:0 auto; display:grid; place-items:center; background: conic-gradient(var(--accent) calc(var(--score,0) * 1%), rgba(255,255,255,.08) 0); position:relative; }
+    .score-ring::after { content:""; position:absolute; inset:12px; border-radius:50%; background:#0d0e12; border:1px solid var(--line); }
+    .score-number { position:relative; z-index:1; text-align:center; font-weight:950; font-size:56px; letter-spacing:-.08em; }
+    .score-number span { display:block; font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-top:3px; }
+    .verdict { text-align:center; font-size:24px; letter-spacing:-.04em; margin:0; }
+    .service-pill { text-align:center; padding:11px 13px; border-radius:999px; border:1px solid rgba(229,57,53,.26); color:#fff; background:rgba(229,57,53,.16); font-weight:950; font-size:13px; }
 
-    .mark {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: var(--ink);
-      color: var(--paper);
-      display: grid;
-      place-items: center;
-      font-weight: 900;
-      letter-spacing: -.08em;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.1);
-    }
+    .score-breakdown { display:grid; gap:9px; }
+    .score-row { display:grid; grid-template-columns: 1fr 42px; gap:10px; align-items:center; font-size:13px; color:var(--muted); }
+    .bar { height:7px; border-radius:999px; background:rgba(255,255,255,.08); overflow:hidden; margin-top:5px; }
+    .bar div { height:100%; width:0; background:var(--accent); border-radius:999px; }
 
-    .settings-btn {
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.28);
-      color: var(--ink);
-      border-radius: 999px;
-      padding: 10px 14px;
-      cursor: pointer;
-      font-weight: 750;
-    }
+    .detail { padding:28px; display:grid; gap:18px; }
+    .detail h2, .detail h3, .detail h4 { margin:0; letter-spacing:-.035em; }
+    .summary { color:var(--muted); font-size:17px; line-height:1.65; margin:0; }
+    .chips { display:flex; flex-wrap:wrap; gap:8px; }
+    .chip { border:1px solid var(--line); border-radius:999px; background:rgba(255,255,255,.04); padding:8px 11px; color:var(--muted); font-size:13px; font-weight:800; }
+    .block { padding:20px; border:1px solid var(--line); border-radius:var(--radius-lg); background:rgba(255,255,255,.03); }
+    .block p, .block li { color:var(--muted); line-height:1.6; }
+    .block p:last-child { margin-bottom:0; }
+    ul { margin:12px 0 0; padding-left:20px; }
+    .script { white-space:pre-wrap; color:var(--ink); line-height:1.7; font-size:15px; }
+    .weakness-grid { display:grid; gap:10px; margin-top:13px; }
+    .weakness { border:1px solid var(--line); border-radius:16px; padding:14px; background:rgba(255,255,255,.03); }
+    .weakness-top { display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:8px; }
+    .badge { border-radius:999px; padding:6px 9px; font-size:12px; font-weight:900; background:rgba(16,16,15,.06); color:var(--muted); white-space:nowrap; }
+    .badge.high { background:rgba(161,61,51,.12); color:var(--red); }
+    .badge.medium { background:rgba(163,106,34,.13); color:var(--amber); }
+    .badge.low { background:rgba(21,115,79,.12); color:var(--green); }
+    .asset-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:12px; }
+    .asset { border:1px solid var(--line); border-radius:16px; padding:13px; background:rgba(255,255,255,.03); overflow:hidden; }
+    .asset strong { display:block; font-size:13px; margin-bottom:5px; }
+    .asset a, .asset span { color:var(--muted); font-size:13px; word-break:break-word; }
 
-    .hero {
-      display: grid;
-      grid-template-columns: 1.05fr .95fr;
-      gap: 24px;
-      align-items: stretch;
-    }
+    .history { margin-top:24px; padding:24px; }
+    .history-top { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px; }
+    .history-top h2 { margin:0; letter-spacing:-.04em; }
+    .lead-list { display:grid; gap:10px; }
+    .lead-item { display:grid; grid-template-columns:1fr auto; gap:12px; align-items:center; padding:14px; border:1px solid var(--line); border-radius:18px; background:rgba(255,255,255,.03); }
+    .lead-item strong { display:block; }
+    .lead-item small { color:var(--muted); line-height:1.45; }
 
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(20px);
-    }
+    .modal { position:fixed; inset:0; display:none; align-items:center; justify-content:center; padding:24px; background:rgba(0,0,0,.65); z-index:20; }
+    .modal.show { display:flex; }
+    .modal-card { width:min(720px,100%); max-height:90vh; overflow:auto; padding:28px; background:#101114; border:1px solid var(--line); border-radius:var(--radius-xl); box-shadow:var(--shadow); }
+    .modal-card h2 { margin:0 0 12px; }
+    .modal-card p { color:var(--muted); line-height:1.55; }
+    .settings-grid { display:grid; gap:14px; margin:18px 0; }
 
-    .intro {
-      padding: clamp(28px, 5vw, 52px);
-    }
-
-    .eyebrow {
-      color: var(--accent-dark);
-      text-transform: uppercase;
-      letter-spacing: .18em;
-      font-size: 12px;
-      font-weight: 900;
-      margin-bottom: 18px;
-    }
-
-    h1 {
-      margin: 0;
-      max-width: 760px;
-      font-size: clamp(42px, 8vw, 92px);
-      line-height: .88;
-      letter-spacing: -.075em;
-    }
-
-    .intro p {
-      max-width: 640px;
-      margin: 24px 0 0;
-      color: var(--muted);
-      font-size: 18px;
-      line-height: 1.65;
-    }
-
-    .scanner {
-      padding: clamp(22px, 4vw, 34px);
-      display: grid;
-      gap: 16px;
-    }
-
-    label {
-      display: block;
-      font-size: 14px;
-      font-weight: 850;
-      color: var(--ink);
-      margin-bottom: 10px;
-    }
-
-    textarea, input {
-      width: 100%;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.48);
-      color: var(--ink);
-      border-radius: var(--radius-lg);
-      outline: none;
-      padding: 17px 18px;
-      transition: border .16s, background .16s, box-shadow .16s;
-    }
-
-    textarea {
-      min-height: 172px;
-      resize: vertical;
-      line-height: 1.55;
-    }
-
-    textarea:focus, input:focus {
-      border-color: rgba(200,139,74,.65);
-      background: rgba(255,255,255,.72);
-      box-shadow: 0 0 0 5px rgba(200,139,74,.12);
-    }
-
-    .hint {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    .btn {
-      border: 0;
-      border-radius: 999px;
-      padding: 16px 22px;
-      cursor: pointer;
-      font-weight: 900;
-      letter-spacing: -.02em;
-      color: var(--paper);
-      background: var(--ink);
-      box-shadow: 0 12px 32px rgba(21,21,21,.16);
-      transition: transform .14s, opacity .14s;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .btn:hover { transform: translateY(-1px); }
-    .btn:disabled { opacity: .58; cursor: not-allowed; transform: none; }
-    .btn.secondary {
-      background: rgba(255,255,255,.4);
-      color: var(--ink);
-      border: 1px solid var(--line);
-      box-shadow: none;
-    }
-
-    .actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .status {
-      display: none;
-      padding: 13px 15px;
-      border-radius: 18px;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.34);
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.55;
-    }
-    .status.show { display: block; }
-    .status.err { color: var(--danger); border-color: rgba(161,60,50,.32); }
-    .status.ok { color: var(--success); border-color: rgba(23,114,69,.32); }
-
-    .result {
-      margin-top: 24px;
-      display: none;
-      grid-template-columns: .75fr 1.25fr;
-      gap: 24px;
-    }
-
-    .result.show { display: grid; }
-
-    .score-card {
-      padding: 28px;
-      position: sticky;
-      top: 20px;
-    }
-
-    .score-ring {
-      width: 180px;
-      height: 180px;
-      border-radius: 50%;
-      margin: 0 auto 22px;
-      display: grid;
-      place-items: center;
-      background: conic-gradient(var(--accent) calc(var(--score, 0) * 1%), rgba(21,21,21,.08) 0);
-      position: relative;
-    }
-
-    .score-ring::after {
-      content: "";
-      position: absolute;
-      inset: 12px;
-      border-radius: 50%;
-      background: var(--paper);
-      border: 1px solid var(--line);
-    }
-
-    .score-number {
-      position: relative;
-      z-index: 1;
-      text-align: center;
-      font-weight: 950;
-      font-size: 54px;
-      letter-spacing: -.08em;
-    }
-
-    .score-number span {
-      display: block;
-      font-size: 12px;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    .verdict {
-      text-align: center;
-      font-size: 24px;
-      letter-spacing: -.035em;
-      margin: 0 0 10px;
-    }
-
-    .service-pill {
-      width: fit-content;
-      max-width: 100%;
-      margin: 0 auto;
-      padding: 9px 13px;
-      border-radius: 999px;
-      background: rgba(200,139,74,.16);
-      border: 1px solid rgba(200,139,74,.28);
-      color: var(--accent-dark);
-      font-weight: 850;
-      font-size: 13px;
-      text-align: center;
-    }
-
-    .detail {
-      padding: 28px;
-      display: grid;
-      gap: 18px;
-    }
-
-    .detail h2, .detail h3 {
-      margin: 0;
-      letter-spacing: -.035em;
-    }
-
-    .summary {
-      color: var(--muted);
-      font-size: 17px;
-      line-height: 1.65;
-      margin: 0;
-    }
-
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .chip {
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: rgba(255,255,255,.38);
-      padding: 8px 11px;
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 750;
-    }
-
-    .block {
-      padding: 20px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius-lg);
-      background: rgba(255,255,255,.32);
-    }
-
-    .block p, .block li {
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    .block p:last-child { margin-bottom: 0; }
-
-    ul { margin: 12px 0 0; padding-left: 20px; }
-
-    .script {
-      white-space: pre-wrap;
-      color: var(--ink);
-      line-height: 1.68;
-      font-size: 15px;
-    }
-
-    .history {
-      margin-top: 24px;
-      padding: 24px;
-    }
-
-    .history-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .history-top h2 { margin: 0; letter-spacing: -.04em; }
-
-    .lead-list {
-      display: grid;
-      gap: 10px;
-    }
-
-    .lead-item {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 12px;
-      align-items: center;
-      padding: 14px;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: rgba(255,255,255,.3);
-    }
-
-    .lead-item strong { display: block; }
-    .lead-item small { color: var(--muted); line-height: 1.45; }
-
-    .modal {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      background: rgba(21,21,21,.42);
-      z-index: 20;
-    }
-    .modal.show { display: flex; }
-
-    .modal-card {
-      width: min(680px, 100%);
-      padding: 28px;
-      background: var(--paper);
-      border: 1px solid var(--line);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow);
-    }
-
-    .modal-card h2 { margin: 0 0 12px; }
-    .modal-card p { color: var(--muted); line-height: 1.55; }
-
-    .settings-grid {
-      display: grid;
-      gap: 14px;
-      margin: 18px 0;
-    }
-
-    @media (max-width: 900px) {
-      .hero, .result { grid-template-columns: 1fr; }
-      .score-card { position: static; }
-      h1 { font-size: clamp(44px, 16vw, 72px); }
+    @media (max-width: 940px) {
+      .hero, .result { grid-template-columns:1fr; }
+      .score-card { position:static; }
+      h1 { font-size: clamp(48px, 16vw, 82px); }
+      .mini-grid, .asset-grid { grid-template-columns:1fr; }
     }
   </style>
 </head>
@@ -429,21 +142,28 @@
 
     <section class="hero">
       <div class="card intro">
-        <div class="eyebrow">Modestio internal tool</div>
-        <h1>Scan. Score. Call.</h1>
-        <p>Vlož IČO, web nebo sociální sítě. Aplikace vyhodnotí, jestli je firma dobrý lead pro Modestio, doporučí službu a připraví přirozený friendly callscript.</p>
+        <div>
+          <div class="eyebrow">Modestio internal tool</div>
+          <h1>Find. Audit. Call.</h1>
+          <p>Vlož jen IČO, web nebo sociální síť. Scanner dohledá dostupné veřejné signály, projde web, najde odkazy na sítě a připraví obchodně použitelný audit pro coldcall.</p>
+        </div>
+        <div class="mini-grid">
+          <div class="mini-card"><strong>01</strong><span>ARES + web discovery</span></div>
+          <div class="mini-card"><strong>02</strong><span>brand, web, UX, obsah</span></div>
+          <div class="mini-card"><strong>03</strong><span>friendly callscript</span></div>
+        </div>
       </div>
 
       <div class="card scanner">
         <div>
           <label for="leadInput">Lead ke scanu</label>
-          <textarea id="leadInput" placeholder="Např.\nIČO: 12345678\nhttps://www.firma.cz\nhttps://instagram.com/firma\n\nNebo sem prostě vlož jen web / IČO / sociální síť."></textarea>
+          <textarea id="leadInput" placeholder="Stačí vložit jedno z toho:\n\nIČO: 24741876\nhttps://www.firma.cz\nhttps://instagram.com/firma\n\nVolitelně můžeš přidat poznámku: restaurace v Praze, starší web, slabý Instagram…"></textarea>
         </div>
         <div class="actions">
           <button class="btn" id="scanBtn">Scanovat lead</button>
           <button class="btn secondary" id="clearBtn">Vyčistit</button>
         </div>
-        <div class="hint">AI klíč není v tomto webu. Běží bezpečně přes Cloudflare Worker, který nastavíme v dalším kroku.</div>
+        <div class="hint">Pro plné dohledání webu a sociálních sítí podle samotného IČO přidej ve Workeru také SERPER_API_KEY. Bez něj scanner analyzuje ARES, zadaný web a sociální odkazy nalezené na webu.</div>
         <div class="status" id="status"></div>
       </div>
     </section>
@@ -453,7 +173,9 @@
         <div class="score-ring" id="scoreRing"><div class="score-number"><span id="scoreValue">–</span><span>lead score</span></div></div>
         <h2 class="verdict" id="verdict">–</h2>
         <div class="service-pill" id="servicePill">–</div>
-        <div class="actions" style="justify-content:center; margin-top:20px;">
+        <div class="chips" id="chips" style="justify-content:center;"></div>
+        <div class="score-breakdown" id="scoreBreakdown"></div>
+        <div class="actions" style="justify-content:center;">
           <button class="btn secondary" id="copyScriptBtn">Kopírovat callscript</button>
         </div>
       </aside>
@@ -465,16 +187,24 @@
           <p class="summary" id="summary"></p>
         </div>
 
-        <div class="chips" id="chips"></div>
-
         <div class="block">
-          <h3>Proč je to příležitost</h3>
-          <ul id="reasons"></ul>
+          <h3>Dohledané podklady</h3>
+          <div class="asset-grid" id="assets"></div>
         </div>
 
         <div class="block">
-          <h3>Slabá místa</h3>
-          <ul id="weaknesses"></ul>
+          <h3>Co řešit na coldcallu</h3>
+          <ul id="callAgenda"></ul>
+        </div>
+
+        <div class="block">
+          <h3>Největší příležitosti</h3>
+          <div class="weakness-grid" id="opportunities"></div>
+        </div>
+
+        <div class="block">
+          <h3>Slabá místa a doporučení</h3>
+          <div class="weakness-grid" id="weaknesses"></div>
         </div>
 
         <div class="block">
@@ -501,15 +231,15 @@
   <div class="modal" id="settingsModal">
     <div class="modal-card">
       <h2>Nastavení AI napojení</h2>
-      <p>Sem vlož URL svého Cloudflare Workeru. OpenAI API klíč zůstává bezpečně uložený ve Workeru, nikdy ne v GitHub Pages.</p>
+      <p>Sem vlož URL Cloudflare Workeru. OpenAI API klíč a případně Serper API klíč zůstávají bezpečně uložené ve Workeru, nikdy ne v GitHub Pages.</p>
       <div class="settings-grid">
         <div>
           <label for="workerUrl">Worker URL</label>
-          <input id="workerUrl" placeholder="https://modestio-lead-scanner.tvoje-jmeno.workers.dev" />
+          <input id="workerUrl" placeholder="https://modestio-lead-scanner-api.tvoje-jmeno.workers.dev" />
         </div>
         <div>
           <label for="clientToken">Volitelný přístupový token</label>
-          <input id="clientToken" placeholder="např. vlastni-heslo-pro-aplikaci" />
+          <input id="clientToken" placeholder="pokud nastavíš APP_ACCESS_TOKEN ve Workeru" />
         </div>
       </div>
       <div class="actions">
@@ -526,8 +256,8 @@
       set workerUrl(v) { localStorage.setItem('modestio_worker_url', v.trim()); },
       get token() { return localStorage.getItem('modestio_client_token') || ''; },
       set token(v) { localStorage.setItem('modestio_client_token', v.trim()); },
-      get scans() { return JSON.parse(localStorage.getItem('modestio_scans') || '[]'); },
-      set scans(v) { localStorage.setItem('modestio_scans', JSON.stringify(v)); }
+      get scans() { return JSON.parse(localStorage.getItem('modestio_scans_v3') || '[]'); },
+      set scans(v) { localStorage.setItem('modestio_scans_v3', JSON.stringify(v)); }
     };
 
     let lastScan = null;
@@ -537,24 +267,55 @@
       el.textContent = message;
       el.className = 'status show' + (type ? ' ' + type : '');
     }
+    function hideStatus() { $('status').className = 'status'; $('status').textContent = ''; }
+    function escapeHtml(str = '') { return String(str).replace(/[&<>"]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m])); }
+    function asArray(value) { return Array.isArray(value) ? value : []; }
 
-    function hideStatus() {
-      $('status').className = 'status';
-      $('status').textContent = '';
+    function renderAssets(scan) {
+      const assets = scan.discovered_assets || {};
+      const profiles = assets.social_profiles || {};
+      const rows = [
+        ['Web', assets.website || scan.source?.parsed?.website || 'Nenalezeno'],
+        ['Instagram', profiles.instagram || 'Nenalezeno'],
+        ['Facebook', profiles.facebook || 'Nenalezeno'],
+        ['LinkedIn', profiles.linkedin || 'Nenalezeno'],
+        ['Další sítě', asArray(profiles.other).join(', ') || 'Nenalezeno'],
+        ['Poznámka k brandu', assets.logo_or_brand_notes || 'Bez poznámky']
+      ];
+      $('assets').innerHTML = rows.map(([label, value]) => {
+        const url = /^https?:\/\//i.test(value) ? value : '';
+        return `<div class="asset"><strong>${escapeHtml(label)}</strong>${url ? `<a href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${escapeHtml(url)}</a>` : `<span>${escapeHtml(value)}</span>`}</div>`;
+      }).join('');
     }
 
-    function escapeHtml(str = '') {
-      return String(str).replace(/[&<>"]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
+    function renderScoreBreakdown(scores = {}) {
+      const labels = {
+        brand_identity: 'Brand / identita',
+        website_design: 'Design webu',
+        ux_conversion: 'UX / konverze',
+        social_media: 'Sociální sítě',
+        seo_content: 'SEO / obsah',
+        technical_trust: 'Důvěryhodnost'
+      };
+      $('scoreBreakdown').innerHTML = Object.entries(labels).map(([key, label]) => {
+        const val = Math.max(0, Math.min(100, Number(scores[key] || 0)));
+        return `<div class="score-row"><div><div>${label}</div><div class="bar"><div style="width:${val}%"></div></div></div><strong>${val}</strong></div>`;
+      }).join('');
     }
 
-    function renderList(id, items) {
-      const el = $(id);
-      el.innerHTML = '';
-      (items || []).forEach(item => {
-        const li = document.createElement('li');
-        li.textContent = item;
-        el.appendChild(li);
-      });
+    function renderSimpleList(id, items) {
+      $(id).innerHTML = asArray(items).map(item => `<li>${escapeHtml(item)}</li>`).join('');
+    }
+
+    function renderCards(id, items, type = 'weakness') {
+      $(id).innerHTML = asArray(items).map(item => {
+        const severity = String(item.severity || item.priority || '').toLowerCase();
+        const badgeClass = severity.includes('high') || severity.includes('vysok') ? 'high' : severity.includes('low') || severity.includes('nízk') ? 'low' : 'medium';
+        if (type === 'opportunity') {
+          return `<div class="weakness"><div class="weakness-top"><h4>${escapeHtml(item.title || 'Příležitost')}</h4><span class="badge ${badgeClass}">${escapeHtml(item.priority || 'priorita')}</span></div><p>${escapeHtml(item.detail || '')}</p><p><strong>Na callu:</strong> ${escapeHtml(item.how_to_use_on_call || '')}</p></div>`;
+        }
+        return `<div class="weakness"><div class="weakness-top"><h4>${escapeHtml(item.area || 'Oblast')}</h4><span class="badge ${badgeClass}">${escapeHtml(item.severity || 'medium')}</span></div><p><strong>Zjištění:</strong> ${escapeHtml(item.finding || '')}</p><p><strong>Dopad:</strong> ${escapeHtml(item.impact || '')}</p><p><strong>Doporučení:</strong> ${escapeHtml(item.recommendation || '')}</p></div>`;
+      }).join('');
     }
 
     function renderScan(scan) {
@@ -563,23 +324,23 @@
       const score = Math.max(0, Math.min(100, Number(scan.lead_score || 0)));
       $('scoreRing').style.setProperty('--score', score);
       $('scoreValue').textContent = score;
-      $('verdict').textContent = scan.verdict || 'Vyhodnoceno';
-      $('servicePill').textContent = scan.recommended_service || 'Doporučená služba Modestia';
+      $('verdict').textContent = scan.lead_quality || scan.verdict || 'Vyhodnoceno';
+      $('servicePill').textContent = asArray(scan.recommended_services).join(' + ') || scan.recommended_service || 'Doporučená služba Modestia';
       $('companyName').textContent = scan.company_name || 'Neznámá firma';
       $('headline').textContent = scan.headline || 'Výsledek scanu';
-      $('summary').textContent = scan.summary || '';
+      $('summary').textContent = scan.executive_summary || scan.summary || '';
 
       const chips = $('chips');
       chips.innerHTML = '';
-      [scan.lead_temperature, scan.priority, scan.confidence].filter(Boolean).forEach(value => {
-        const chip = document.createElement('div');
-        chip.className = 'chip';
-        chip.textContent = value;
-        chips.appendChild(chip);
+      [scan.priority, scan.confidence, scan.lead_temperature].filter(Boolean).forEach(value => {
+        const chip = document.createElement('div'); chip.className = 'chip'; chip.textContent = value; chips.appendChild(chip);
       });
 
-      renderList('reasons', scan.reasons || []);
-      renderList('weaknesses', scan.weaknesses || []);
+      renderScoreBreakdown(scan.scores || {});
+      renderAssets(scan);
+      renderSimpleList('callAgenda', scan.call_agenda || []);
+      renderCards('opportunities', scan.opportunity_signals || [], 'opportunity');
+      renderCards('weaknesses', scan.weaknesses || [], 'weakness');
       $('callScript').textContent = scan.call_script || '';
       $('followupEmail').textContent = scan.followup_email || '';
       window.scrollTo({ top: $('result').offsetTop - 16, behavior: 'smooth' });
@@ -588,103 +349,58 @@
     function saveToHistory(scan) {
       const scans = storage.scans;
       scans.unshift({ ...scan, saved_at: new Date().toISOString() });
-      storage.scans = scans.slice(0, 25);
+      storage.scans = scans.slice(0, 30);
       renderHistory();
     }
 
     function renderHistory() {
       const list = $('historyList');
       const scans = storage.scans;
-      if (!scans.length) {
-        list.innerHTML = '<div class="hint">Zatím tu nejsou žádné scany.</div>';
-        return;
-      }
+      if (!scans.length) { list.innerHTML = '<div class="hint">Zatím tu nejsou žádné scany.</div>'; return; }
       list.innerHTML = scans.map((scan, index) => `
         <div class="lead-item">
           <div>
             <strong>${escapeHtml(scan.company_name || 'Neznámá firma')} · ${escapeHtml(String(scan.lead_score || '–'))}/100</strong>
-            <small>${escapeHtml(scan.verdict || '')} · ${escapeHtml(scan.recommended_service || '')}</small>
+            <small>${escapeHtml(scan.lead_quality || scan.verdict || '')} · ${escapeHtml(asArray(scan.recommended_services).join(' + ') || scan.recommended_service || '')}</small>
           </div>
           <button class="btn secondary" onclick="loadHistory(${index})">Otevřít</button>
-        </div>
-      `).join('');
+        </div>`).join('');
     }
 
-    window.loadHistory = function(index) {
-      const scan = storage.scans[index];
-      if (scan) renderScan(scan);
-    };
+    window.loadHistory = function(index) { const scan = storage.scans[index]; if (scan) renderScan(scan); };
 
     async function scanLead() {
       const input = $('leadInput').value.trim();
-      if (!input) {
-        showStatus('Nejdřív vlož IČO, web nebo sociální síť.', 'err');
-        return;
-      }
+      if (!input) { showStatus('Nejdřív vlož IČO, web nebo sociální síť.', 'err'); return; }
       const workerUrl = storage.workerUrl;
-      if (!workerUrl) {
-        $('settingsModal').classList.add('show');
-        showStatus('Nejdřív nastav Worker URL. To je bezpečný backend pro OpenAI API.', 'err');
-        return;
-      }
+      if (!workerUrl) { $('settingsModal').classList.add('show'); showStatus('Nejdřív nastav Worker URL.', 'err'); return; }
 
       $('scanBtn').disabled = true;
-      showStatus('Scanuju lead, načítám dostupná data a posílám je do AI…');
-
+      showStatus('Scanuju lead: ARES, web, sociální odkazy, veřejné dohledání a AI audit…');
       try {
         const res = await fetch(workerUrl.replace(/\/$/, '') + '/scan', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...(storage.token ? { 'x-app-token': storage.token } : {})
-          },
+          headers: { 'Content-Type': 'application/json', ...(storage.token ? { 'x-app-token': storage.token } : {}) },
           body: JSON.stringify({ input })
         });
         const data = await res.json().catch(() => null);
-        if (!res.ok) {
-          throw new Error(data?.error || 'Scan se nepovedl. Zkontroluj Worker a API klíč.');
-        }
-        renderScan(data);
-        saveToHistory(data);
-        showStatus('Hotovo. Lead je vyhodnocený a uložený do historie.', 'ok');
-      } catch (error) {
-        showStatus(error.message || 'Něco se pokazilo.', 'err');
-      } finally {
-        $('scanBtn').disabled = false;
-      }
+        if (!res.ok) throw new Error(data?.error || 'Scan se nepovedl. Zkontroluj Worker a API klíč.');
+        renderScan(data); saveToHistory(data); showStatus('Hotovo. Lead je vyhodnocený a uložený do historie.', 'ok');
+      } catch (error) { showStatus(error.message || 'Něco se pokazilo.', 'err'); }
+      finally { $('scanBtn').disabled = false; }
     }
 
     $('scanBtn').addEventListener('click', scanLead);
     $('clearBtn').addEventListener('click', () => { $('leadInput').value = ''; hideStatus(); });
-    $('copyScriptBtn').addEventListener('click', async () => {
-      if (!lastScan?.call_script) return;
-      await navigator.clipboard.writeText(lastScan.call_script);
-      showStatus('Callscript zkopírován.', 'ok');
-    });
-
+    $('copyScriptBtn').addEventListener('click', async () => { if (!lastScan?.call_script) return; await navigator.clipboard.writeText(lastScan.call_script); showStatus('Callscript zkopírován.', 'ok'); });
     $('exportBtn').addEventListener('click', () => {
       const blob = new Blob([JSON.stringify(storage.scans, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `modestio-lead-scans-${new Date().toISOString().slice(0,10)}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
+      const url = URL.createObjectURL(blob); const a = document.createElement('a');
+      a.href = url; a.download = `modestio-lead-scans-${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url);
     });
-
-    $('openSettings').addEventListener('click', () => {
-      $('workerUrl').value = storage.workerUrl;
-      $('clientToken').value = storage.token;
-      $('settingsModal').classList.add('show');
-    });
+    $('openSettings').addEventListener('click', () => { $('workerUrl').value = storage.workerUrl; $('clientToken').value = storage.token; $('settingsModal').classList.add('show'); });
     $('closeSettings').addEventListener('click', () => $('settingsModal').classList.remove('show'));
-    $('saveSettings').addEventListener('click', () => {
-      storage.workerUrl = $('workerUrl').value;
-      storage.token = $('clientToken').value;
-      $('settingsModal').classList.remove('show');
-      showStatus('Nastavení uloženo. Teď můžeš spustit scan.', 'ok');
-    });
-
+    $('saveSettings').addEventListener('click', () => { storage.workerUrl = $('workerUrl').value; storage.token = $('clientToken').value; $('settingsModal').classList.remove('show'); showStatus('Nastavení uloženo. Teď můžeš spustit scan.', 'ok'); });
     renderHistory();
   </script>
 </body>
